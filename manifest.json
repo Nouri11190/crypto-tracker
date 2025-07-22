@@ -1,0 +1,9 @@
+{
+    "name": "Dontraval Crypto Tracker",
+    "short_name": "CryptoTracker",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "description": "Track WETH, aUSDT, and CBBTC token prices.",
+    "icons": []
+}
