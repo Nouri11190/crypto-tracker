@@ -2,70 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Crypto Tracker</title>
-  <script src="wallet.js" defer></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crypto Wallet Tracker</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #0d1117;
-      color: #c9d1d9;
-      text-align: center;
-      padding: 2rem;
-    }
-
-    h2 {
-      color: #58a6ff;
-    }
-
-    input, button {
-      padding: 10px;
-      margin: 5px;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-    }
-
-    input {
-      width: 400px;
-    }
-
-    button {
-      background-color: #238636;
-      color: white;
-      cursor: pointer;
-    }
-
-    ul {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    li {
-      margin: 10px 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.1rem;
-    }
-
-    img {
-      vertical-align: middle;
-    }
-
-    #spinner {
-      display: none;
-      margin: 2rem auto;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    h2, h3 { margin-bottom: 10px; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 8px 0; }
+    img { vertical-align: middle; margin-right: 6px; }
+    #spinner { display: none; }
   </style>
 </head>
 <body>
-  <h2>Crypto Tracker</h2>
-  <button id="connect-btn">Connect MetaMask</button>
-  <input type="text" id="wallet-address" placeholder="or paste wallet address" />
-  <button onclick="manualLoad()">Load Balances</button>
+  <h2>🧠 Multichain Crypto Wallet Tracker</h2>
 
-  <div id="spinner">🔄 Loading...</div>
-  <div id="wallet-display"></div>
+  <label for="chain-select">Choose chain:</label>
+  <select id="chain-select">
+    <option value="ethereum">Ethereum</option>
+    <option value="polygon">Polygon</option>
+    <option value="arbitrum">Arbitrum</option>
+  </select>
+
+  <br /><br />
+
+  <input type="text" id="wallet-address" placeholder="Enter wallet address" size="42"/>
+  <button onclick="manualLoad()">Check Balance</button>
+  <button id="connect-btn">Connect MetaMask</button>
+
+  <div id="spinner">⏳ Loading...</div>
+
+  <div id="wallet-display" style="margin-top: 20px;"></div>
+
+  <script src="wallet.js"></script>
 </body>
 </html>
