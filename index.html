@@ -1,24 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Crypto Tracker</title>
-  <link rel="stylesheet" href="styles.css"/>
+  <script src="wallet.js" defer></script>
 </head>
 <body>
-  <div class="container">
-    <h1>Famzzy Crypto Tracker</h1>
-    <div id="wallet-section"></div>
-    <div id="tracker-table"></div>
-  </div>
-  <script src="tokens.json" type="application/json"></script>
-  <script src="wallet.js"></script>
-  <script src="tracker.js"></script>
+  <h2>Crypto Tracker</h2>
+
+  <button id="connect-btn">Connect MetaMask</button>
+  <input type="text" id="wallet-address" placeholder="or paste wallet address" size="60">
+  <button onclick="manualLoad()">Load Balances</button>
+
+  <div id="wallet-display"></div>
 </body>
 </html>
-<input type="text" id="walletInput" placeholder="0xEed79733BF831E3abaFf4f43E6658A67b497952b">
-<button onclick="loadWalletData(document.getElementById('walletInput').value)">Check Balance</button>
-<div id="wallet-display"></div>
-
-<script src="wallet.js"></script>
