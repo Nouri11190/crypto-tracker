@@ -44,15 +44,13 @@ async function loadWalletData(walletAddress) {
     const items = covalentData.data.items;
     let html = `<h3>Token Balances for ${walletAddress}</h3><ul>`;
 
-    for (const token of tokens) {
-      let tokenData;
-
+  
       if (token.address.toLowerCase() === "native") {
-        tokenData = items.find(t => t.contract_address === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
-      } else {
-        tokenData = items.find(t => t.contract_address.toLowerCase() === token.address.toLowerCase());
-      }
-
+  tokenData = items.find(t =>
+    t.contract_ticker_symbol === "ETH" ||
+    t.contract_address === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  );
+}
       if (tokenData) {
         const balance = (parseFloat(tokenData.balance) / Math.pow(10, token.decimals)).toFixed(4);
         html += `<li><img src="${token.logo}" width="20" onerror="this.src='fallback.png'" /> ${token.symbol}: ${balance}</li>`;
