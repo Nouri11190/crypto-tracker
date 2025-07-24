@@ -28,6 +28,12 @@ function manualLoad() {
 }
 
 async function loadWalletData(walletAddress) {
+  const spinner = document.getElementById('spinner');
+  const display = document.getElementById('wallet-display');
+
+  spinner.style.display = 'block';
+  display.innerHTML = '';
+
   try {
     const [tokenRes, covalentRes] = await Promise.all([
       fetch('./tokens.json'),
@@ -42,28 +48,42 @@ async function loadWalletData(walletAddress) {
     }
 
     const items = covalentData.data.items;
-    let html = `<h3>Token Balances for ${walletAddress}</h3><ul>`;
+    let balances = [];
 
-  
+    for (const token of tokens) {
+      let tokenData;
+
       if (token.address.toLowerCase() === "native") {
-  tokenData = items.find(t =>
-    t.contract_ticker_symbol === "ETH" ||
-    t.contract_address === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
-  );
-}
-      if (tokenData) {
-        const balance = (parseFloat(tokenData.balance) / Math.pow(10, token.decimals)).toFixed(4);
-        html += `<li><img src="${token.logo}" width="20" onerror="this.src='fallback.png'" /> ${token.symbol}: ${balance}</li>`;
+        tokenData = items.find(t => t.contract_address === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
       } else {
-        html += `<li><img src="${token.logo}" width="20" onerror="this.src='fallback.png'" /> ${token.symbol}: 0.0000</li>`;
+        tokenData = items.find(t => t.contract_address.toLowerCase() === token.address.toLowerCase());
       }
+
+      const balance = tokenData
+        ? (parseFloat(tokenData.balance) / Math.pow(10, token.decimals))
+        : 0;
+
+      balances.push({
+        symbol: token.symbol,
+        logo: token.logo,
+        value: balance.toFixed(4)
+      });
     }
 
+    // Sort by balance descending
+    balances.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
+
+    let html = `<h3>Token Balances for ${walletAddress}</h3><ul>`;
+    for (const b of balances) {
+      html += `<li><img src="${b.logo}" width="20" onerror="this.src='fallback.png'" /> ${b.symbol}: ${b.value}</li>`;
+    }
     html += "</ul>";
-    document.getElementById("wallet-display").innerHTML = html;
+    display.innerHTML = html;
 
   } catch (error) {
     console.error("Error loading wallet data:", error);
-    document.getElementById("wallet-display").innerHTML = `<p style="color:red;">Failed to load wallet data.</p>`;
+    display.innerHTML = `<p style="color:red;">Failed to load wallet data.</p>`;
+  } finally {
+    spinner.style.display = 'none';
   }
 }
