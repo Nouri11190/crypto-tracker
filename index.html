@@ -1,70 +1,193 @@
-async function loadWalletData(wallet) {
-  const display = document.getElementById('wallet-display');
-  const spinner = document.getElementById('spinner');
-  const selectedChainId = document.getElementById('chain-selector').value;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Multi-Chain Wallet Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f0f0f;
+      color: #ffffff;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 0.5rem 0;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: none;
+    }
+    button {
+      background: #1a73e8;
+      color: white;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    li {
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      background: #1a1a1a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+    }
+    li img {
+      margin-right: 10px;
+    }
+    #spinner {
+      display: none;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔍 Multi-Chain Token Tracker</h2>
 
-  spinner.style.display = 'block';
-  display.innerHTML = '';
+    <input type="text" id="wallet-address" placeholder="Paste or connect wallet address..." />
 
-  try {
-    const tokenFile = `./tokens/${getChainName(selectedChainId)}.json`;
-    const tokenRes = await fetch(tokenFile);
-    const tokenList = await tokenRes.json();
+    <select id="chain-selector">
+      <option value="1">Ethereum</option>
+      <option value="56">BSC</option>
+      <option value="137">Polygon</option>
+      <option value="10">Optimism</option>
+      <option value="42161">Arbitrum</option>
+      <option value="8453">Base</option>
+    </select>
 
-    const covalentUrl = `https://api.covalenthq.com/v1/${selectedChainId}/address/${wallet}/balances_v2/?key=${API_KEY}`;
-    const covalentRes = await fetch(covalentUrl);
-    const covalentData = await covalentRes.json();
+    <button onclick="connectWallet()">🔗 Connect Wallet</button>
+    <button id="load-btn">📥 Load Balances</button>
 
-    if (!covalentData?.data?.items) throw new Error("Invalid Covalent response");
+    <div id="spinner">⏳ Loading...</div>
+    <div id="wallet-display"></div>
+  </div>
 
-    const items = covalentData.data.items;
+  <script>
+    const API_KEY = "cqt_rQYP4Ht4X7jvVDrRmBXGGdCdFjXc"; // Your Covalent API key
 
-    let balances = tokenList.map(token => {
-      let match = items.find(item =>
-        token.address === 'native'
-          ? item.contract_ticker_symbol === 'ETH' || item.contract_address === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-          : item.contract_address.toLowerCase() === token.address.toLowerCase()
-      );
+    let provider;
 
-      const value = match
-        ? (parseFloat(match.balance) / Math.pow(10, token.decimals)).toFixed(4)
-        : "0.0000";
+    async function connectWallet() {
+      if (typeof window.ethereum !== "undefined") {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const wallet = accounts[0];
+          document.getElementById("wallet-address").value = wallet;
+          loadWalletData(wallet);
+          return;
+        } catch (err) {
+          alert("MetaMask connection failed.");
+          return;
+        }
+      }
 
-      return {
-        symbol: token.symbol,
-        logo: token.logo,
-        value
+      provider = new WalletConnectProvider.default({
+        rpc: {
+          1: "https://eth.llamarpc.com",
+          56: "https://bsc-dataseed.binance.org",
+          137: "https://polygon-rpc.com",
+          10: "https://mainnet.optimism.io",
+          42161: "https://arb1.arbitrum.io/rpc",
+          8453: "https://mainnet.base.org"
+        }
+      });
+
+      await provider.enable();
+
+      const web3 = new Web3(provider);
+      const accounts = await web3.eth.getAccounts();
+      const wallet = accounts[0];
+      document.getElementById("wallet-address").value = wallet;
+      loadWalletData(wallet);
+    }
+
+    async function loadWalletData(wallet) {
+      const display = document.getElementById('wallet-display');
+      const spinner = document.getElementById('spinner');
+      const selectedChainId = document.getElementById('chain-selector').value;
+
+      spinner.style.display = 'block';
+      display.innerHTML = '';
+
+      try {
+        const tokenFile = `./tokens/${getChainName(selectedChainId)}.json`;
+        const tokenRes = await fetch(tokenFile);
+        const tokenList = await tokenRes.json();
+
+        const covalentUrl = `https://api.covalenthq.com/v1/${selectedChainId}/address/${wallet}/balances_v2/?key=${API_KEY}`;
+        const covalentRes = await fetch(covalentUrl);
+        const covalentData = await covalentRes.json();
+
+        if (!covalentData?.data?.items) throw new Error("Invalid Covalent response");
+
+        const items = covalentData.data.items;
+
+        let balances = tokenList.map(token => {
+          let match = items.find(item =>
+            token.address === 'native'
+              ? item.contract_ticker_symbol === 'ETH' || item.contract_address === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+              : item.contract_address.toLowerCase() === token.address.toLowerCase()
+          );
+
+          const value = match
+            ? (parseFloat(match.balance) / Math.pow(10, token.decimals)).toFixed(4)
+            : "0.0000";
+
+          return {
+            symbol: token.symbol,
+            logo: token.logo,
+            value
+          };
+        });
+
+        balances = balances.filter(b => parseFloat(b.value) > 0);
+        balances.sort((a, b) => parseFloat(b.value) < parseFloat(a.value) ? 1 : -1);
+
+        display.innerHTML = `<h3>📊 Balances on ${getChainName(selectedChainId)}</h3><ul>` +
+          balances.map(b => `
+            <li>
+              <img src="${b.logo}" width="20" onerror="this.src='fallback.png'" />
+              ${b.symbol}: ${b.value}
+            </li>
+          `).join('') +
+          '</ul>';
+
+      } catch (err) {
+        console.error(err);
+        display.innerHTML = `<p style="color:red;">⚠️ Error loading data</p>`;
+      } finally {
+        spinner.style.display = 'none';
+      }
+    }
+
+    function getChainName(id) {
+      const map = {
+        "1": "Ethereum",
+        "56": "BSC",
+        "137": "Polygon",
+        "10": "Optimism",
+        "42161": "Arbitrum",
+        "8453": "Base"
       };
+      return map[id] || "Ethereum";
+    }
+
+    document.getElementById('load-btn').addEventListener('click', () => {
+      const addr = document.getElementById('wallet-address').value.trim();
+      if (addr) loadWalletData(addr);
     });
-
-    balances = balances.filter(b => parseFloat(b.value) > 0);
-    balances.sort((a, b) => parseFloat(b.value) < parseFloat(a.value) ? 1 : -1);
-
-    display.innerHTML = `<h3>📊 Balances on ${getChainName(selectedChainId)}</h3><ul>` +
-      balances.map(b => `
-        <li>
-          <img src="${b.logo}" width="20" onerror="this.src='fallback.png'" />
-          ${b.symbol}: ${b.value}
-        </li>
-      `).join('') +
-      '</ul>';
-
-  } catch (err) {
-    console.error(err);
-    display.innerHTML = `<p style="color:red;">⚠️ Error loading data</p>`;
-  } finally {
-    spinner.style.display = 'none';
-  }
-}
-
-function getChainName(id) {
-  const map = {
-    "1": "Ethereum",
-    "56": "BSC",
-    "137": "Polygon",
-    "10": "Optimism",
-    "42161": "Arbitrum",
-    "8453": "Base"
-  };
-  return map[id] || "Ethereum";
-}
+  </script>
+</body>
+</html>
