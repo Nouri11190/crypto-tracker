@@ -1,32 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Multi‑Chain Wallet Tracker</title>
+  <meta charset="UTF-8">
+  <title>Multi-Chain Wallet Token Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-    h2, h3, h4 { margin: 10px 0; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 8px 0; }
-    img { vertical-align: middle; margin-right: 6px; }
-    #spinner { display: none; }
-    #dashboard { margin-top: 20px; }
-    .chain-section { margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      color: #333;
+    }
+    #wallet-display ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    #wallet-display li {
+      margin: 10px 0;
+      padding: 8px;
+      background: #fff;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+    }
+    #wallet-display img {
+      margin-right: 10px;
+      border-radius: 50%;
+    }
+    #spinner {
+      display: none;
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 90%;
+      font-size: 16px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
-  <h2>🌐 Multi‑Chain Portfolio Dashboard</h2>
 
-  <input type="text" id="wallet-address" placeholder="Enter or paste wallet address" size="42"/>
-  <button onclick="manualLoad()">Load Balances</button>
-  <button id="connect-btn">Connect MetaMask</button>
+  <h2>🔍 Token Balance Tracker</h2>
 
-  <div id="spinner">⏳ Loading...</div>
-  <div id="dashboard"></div>
+  <!-- Connect Wallet Button -->
+  <button id="connect-btn">🔌 Connect Wallet</button>
 
+  <!-- Wallet Address Input -->
+  <input type="text" id="wallet-address" placeholder="Enter wallet address..." />
+
+  <!-- Manual Load Button -->
+  <button id="load-btn">🔄 Load Wallet</button>
+
+  <!-- Spinner / Loading Indicator -->
+  <div id="spinner">⏳ Loading tokens...</div>
+
+  <!-- Token Results Area -->
+  <div id="wallet-display"></div>
+
+  <!-- Dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+
+  <!-- Your main wallet logic -->
   <script src="wallet.js"></script>
+
 </body>
 </html>
