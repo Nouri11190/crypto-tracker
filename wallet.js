@@ -1,62 +1,78 @@
 const API_KEY = "cqt_rQYP4Ht4X7jvVDrRmBXGGdCdFjXc";
-const CHAIN_ID = "1"; // Ethereum Mainnet
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('connect-btn').addEventListener('click', connectWallet);
+const CHAINS = {
+  ethereum: { id: "1", name: "Ethereum" },
+  polygon: { id: "137", name: "Polygon" },
+  arbitrum: { id: "42161", name: "Arbitrum" }
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("connect-btn").addEventListener("click", connectWallet);
+  document.getElementById("chain-select").addEventListener("change", updateChain);
 });
+
+let currentWallet = "";
+let currentChain = "ethereum";
+
+function updateChain() {
+  currentChain = document.getElementById("chain-select").value;
+  if (currentWallet) {
+    loadWalletData(currentWallet);
+  }
+}
 
 async function connectWallet() {
   if (typeof window.ethereum === 'undefined') {
-    alert("MetaMask not found. Please install MetaMask extension.");
+    alert("MetaMask not found. Please install it.");
     return;
   }
 
   try {
     const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    const walletAddress = accounts[0];
-    document.getElementById('wallet-address').value = walletAddress;
-    loadWalletData(walletAddress);
+    const wallet = accounts[0];
+    currentWallet = wallet;
+    document.getElementById("wallet-address").value = wallet;
+    loadWalletData(wallet);
   } catch (err) {
-    console.error("Wallet connect error:", err);
-    alert("Failed to connect to MetaMask.");
+    alert("MetaMask connection failed.");
   }
 }
 
 function manualLoad() {
-  const addr = document.getElementById('wallet-address').value.trim();
-  if (addr) loadWalletData(addr);
+  const addr = document.getElementById("wallet-address").value.trim();
+  if (addr) {
+    currentWallet = addr;
+    loadWalletData(addr);
+  }
 }
 
 async function loadWalletData(walletAddress) {
-  const spinner = document.getElementById('spinner');
-  const display = document.getElementById('wallet-display');
+  const display = document.getElementById("wallet-display");
+  const spinner = document.getElementById("spinner");
 
-  spinner.style.display = 'block';
-  display.innerHTML = '';
+  spinner.style.display = "block";
+  display.innerHTML = "";
 
   try {
-    const [tokenRes, covalentRes] = await Promise.all([
-      fetch('./tokens.json'),
-      fetch(`https://api.covalenthq.com/v1/${CHAIN_ID}/address/${walletAddress}/balances_v2/?key=${API_KEY}`)
-    ]);
-
+    const tokenRes = await fetch(`./tokens/${currentChain}.json`);
     const tokens = await tokenRes.json();
-    const covalentData = await covalentRes.json();
 
-    if (!covalentData || !covalentData.data || !covalentData.data.items) {
-      throw new Error("Invalid response from Covalent.");
-    }
+    const chainID = CHAINS[currentChain].id;
+    const covalentURL = `https://api.covalenthq.com/v1/${chainID}/address/${walletAddress}/balances_v2/?key=${API_KEY}`;
+
+    const covalentRes = await fetch(covalentURL);
+    const covalentData = await covalentRes.json();
 
     const items = covalentData.data.items;
     let balances = [];
+    let totalUSD = 0;
 
     for (const token of tokens) {
       let tokenData;
 
-      if (token.address.toLowerCase() === "native") {
-        // Match ETH either by address or symbol
+      if (token.address === "native") {
         tokenData = items.find(t =>
-          t.contract_ticker_symbol === "ETH" ||
+          t.contract_ticker_symbol.toUpperCase() === token.symbol ||
           t.contract_address === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
         );
       } else {
@@ -65,35 +81,41 @@ async function loadWalletData(walletAddress) {
         );
       }
 
-      const balance = tokenData
-        ? (parseFloat(tokenData.balance) / Math.pow(10, token.decimals))
+      const raw = tokenData
+        ? parseFloat(tokenData.balance) / Math.pow(10, token.decimals)
         : 0;
+
+      const price = tokenData?.quote_rate || 0;
+      const usdValue = raw * price;
+      totalUSD += usdValue;
 
       balances.push({
         symbol: token.symbol,
         logo: token.logo,
-        value: balance.toFixed(4)
+        amount: raw.toFixed(4),
+        usd: usdValue.toFixed(2),
+        price: price.toFixed(2)
       });
     }
 
-    // Sort by token value descending
-    balances.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
+    balances.sort((a, b) => parseFloat(b.usd) - parseFloat(a.usd));
 
-    let html = `<h3>Token Balances for ${walletAddress}</h3><ul>`;
+    let html = `<h3>${CHAINS[currentChain].name} Portfolio: $${totalUSD.toFixed(2)}</h3>`;
+    html += `<ul>`;
     for (const b of balances) {
       html += `
         <li>
           <img src="${b.logo}" width="20" onerror="this.src='fallback.png'" />
-          ${b.symbol}: ${b.value}
+          ${b.symbol}: ${b.amount} × $${b.price} = <strong>$${b.usd}</strong>
         </li>`;
     }
     html += "</ul>";
     display.innerHTML = html;
 
-  } catch (error) {
-    console.error("Error loading wallet data:", error);
-    display.innerHTML = `<p style="color:red;">Failed to load wallet data.</p>`;
+  } catch (err) {
+    console.error("Multichain error:", err);
+    display.innerHTML = `<p style="color:red;">Error loading data for ${currentChain}.</p>`;
   } finally {
-    spinner.style.display = 'none';
+    spinner.style.display = "none";
   }
 }
