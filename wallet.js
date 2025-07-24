@@ -1,30 +1,36 @@
 const API_KEY = "cqt_rQYP4Ht4X7jvVDrRmBXGGdCdFjXc";
-const CHAIN_ID = 1;  // Ethereum mainnet
+const CHAIN_ID = "1"; // Ethereum Mainnet
 
-async function loadWalletData(address) {
-  const display = document.getElementById("wallet-display");
-  display.innerHTML = "Loading...";
-
-  try {
-    const response = await fetch(`https://api.covalenthq.com/v1/${CHAIN_ID}/address/${address}/balances_v2/?key=${API_KEY}`);
-    const data = await response.json();
-
-    if (!data.data || !data.data.items) {
-      display.innerHTML = "No token data found.";
-      return;
-    }
-
-    let html = "<h3>Wallet Balances:</h3><ul>";
-    data.data.items.forEach((token) => {
-      if (token.balance > 0 && token.contract_ticker_symbol) {
-        const balance = (token.balance / 10 ** token.contract_decimals).toFixed(4);
-        html += `<li>${token.contract_ticker_symbol}: ${balance}</li>`;
-      }
-    });
-    html += "</ul>";
-    display.innerHTML = html;
-  } catch (error) {
-    display.innerHTML = "Error fetching wallet data.";
-    console.error(error);
+async function loadWalletData(walletAddress) {
+  if (!walletAddress) {
+    alert("Please enter a wallet address.");
+    return;
   }
+
+  const response = await fetch("tokens.json");
+  const tokens = await response.json();
+
+  let html = `<h3>Token Balances for ${walletAddress}</h3><ul>`;
+
+  for (const token of tokens) {
+    const url = `https://api.covalenthq.com/v1/${CHAIN_ID}/address/${walletAddress}/balances_v2/?key=${API_KEY}`;
+
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      const tokenData = data.data.items.find(t => t.contract_address.toLowerCase() === token.address.toLowerCase());
+
+      if (tokenData) {
+        const balance = (parseFloat(tokenData.balance) / Math.pow(10, token.decimals)).toFixed(4);
+        html += `<li><img src="${token.logo}" width="20"/> ${token.symbol}: ${balance}</li>`;
+      } else {
+        html += `<li><img src="${token.logo}" width="20"/> ${token.symbol}: 0.0000</li>`;
+      }
+    } catch (err) {
+      html += `<li>Error fetching ${token.symbol} balance</li>`;
+    }
+  }
+
+  html += "</ul>";
+  document.getElementById("wallet-display").innerHTML = html;
 }
