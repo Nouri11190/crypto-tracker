@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function connectWallet() {
   if (typeof window.ethereum === 'undefined') {
-    alert("MetaMask not found. Please install it.");
+    alert("MetaMask not found. Please install MetaMask extension.");
     return;
   }
 
@@ -18,7 +18,7 @@ async function connectWallet() {
     loadWalletData(walletAddress);
   } catch (err) {
     console.error("Wallet connect error:", err);
-    alert("Failed to connect MetaMask");
+    alert("Failed to connect to MetaMask.");
   }
 }
 
@@ -54,9 +54,15 @@ async function loadWalletData(walletAddress) {
       let tokenData;
 
       if (token.address.toLowerCase() === "native") {
-        tokenData = items.find(t => t.contract_address === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+        // Match ETH either by address or symbol
+        tokenData = items.find(t =>
+          t.contract_ticker_symbol === "ETH" ||
+          t.contract_address === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+        );
       } else {
-        tokenData = items.find(t => t.contract_address.toLowerCase() === token.address.toLowerCase());
+        tokenData = items.find(t =>
+          t.contract_address.toLowerCase() === token.address.toLowerCase()
+        );
       }
 
       const balance = tokenData
@@ -70,12 +76,16 @@ async function loadWalletData(walletAddress) {
       });
     }
 
-    // Sort by balance descending
+    // Sort by token value descending
     balances.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
 
     let html = `<h3>Token Balances for ${walletAddress}</h3><ul>`;
     for (const b of balances) {
-      html += `<li><img src="${b.logo}" width="20" onerror="this.src='fallback.png'" /> ${b.symbol}: ${b.value}</li>`;
+      html += `
+        <li>
+          <img src="${b.logo}" width="20" onerror="this.src='fallback.png'" />
+          ${b.symbol}: ${b.value}
+        </li>`;
     }
     html += "</ul>";
     display.innerHTML = html;
