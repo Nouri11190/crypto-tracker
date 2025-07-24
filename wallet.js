@@ -3,119 +3,98 @@ const API_KEY = "cqt_rQYP4Ht4X7jvVDrRmBXGGdCdFjXc";
 const CHAINS = {
   ethereum: { id: "1", name: "Ethereum" },
   polygon: { id: "137", name: "Polygon" },
-  arbitrum: { id: "42161", name: "Arbitrum" }
+  arbitrum: { id: "42161", name: "Arbitrum" },
+  base: { id: "8453", name: "Base" },
+  optimism: { id: "10", name: "Optimism" },
+  bsc: { id: "56", name: "Binance Smart Chain" }
 };
 
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("connect-btn").addEventListener("click", connectWallet);
-  document.getElementById("chain-select").addEventListener("change", updateChain);
 });
 
 let currentWallet = "";
-let currentChain = "ethereum";
-
-function updateChain() {
-  currentChain = document.getElementById("chain-select").value;
-  if (currentWallet) {
-    loadWalletData(currentWallet);
-  }
-}
 
 async function connectWallet() {
-  if (typeof window.ethereum === 'undefined') {
-    alert("MetaMask not found. Please install it.");
-    return;
+  if (window.ethereum === undefined) {
+    return alert("MetaMask not installed.");
   }
-
   try {
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    const wallet = accounts[0];
+    const [wallet] = await ethereum.request({ method: 'eth_requestAccounts' });
     currentWallet = wallet;
     document.getElementById("wallet-address").value = wallet;
-    loadWalletData(wallet);
-  } catch (err) {
-    alert("MetaMask connection failed.");
+    loadAllChains(wallet);
+  } catch {
+    alert("MetaMask connect failed.");
   }
 }
 
 function manualLoad() {
   const addr = document.getElementById("wallet-address").value.trim();
-  if (addr) {
-    currentWallet = addr;
-    loadWalletData(addr);
-  }
+  if (addr) loadAllChains(addr);
 }
 
-async function loadWalletData(walletAddress) {
-  const display = document.getElementById("wallet-display");
+async function loadAllChains(wallet) {
   const spinner = document.getElementById("spinner");
-
+  const dash = document.getElementById("dashboard");
   spinner.style.display = "block";
-  display.innerHTML = "";
+  dash.innerHTML = "";
 
-  try {
-    const tokenRes = await fetch(`./tokens/${currentChain}.json`);
-    const tokens = await tokenRes.json();
+  let overallTotal = 0;
 
-    const chainID = CHAINS[currentChain].id;
-    const covalentURL = `https://api.covalenthq.com/v1/${chainID}/address/${walletAddress}/balances_v2/?key=${API_KEY}`;
+  for (const key of Object.keys(CHAINS)) {
+    const chain = CHAINS[key];
+    const tokenFile = `./tokens/${key}.json`;
 
-    const covalentRes = await fetch(covalentURL);
-    const covalentData = await covalentRes.json();
+    try {
+      const [tokenRes, dataRes] = await Promise.all([
+        fetch(tokenFile),
+        fetch(`https://api.covalenthq.com/v1/${chain.id}/address/${wallet}/balances_v2/?key=${API_KEY}`)
+      ]);
+      const tokens = await tokenRes.json();
+      const data = await dataRes.json().then(res => res.data.items || []);
+      
+      let totalUSD = 0;
+      let list = [];
 
-    const items = covalentData.data.items;
-    let balances = [];
-    let totalUSD = 0;
-
-    for (const token of tokens) {
-      let tokenData;
-
-      if (token.address === "native") {
-        tokenData = items.find(t =>
-          t.contract_ticker_symbol.toUpperCase() === token.symbol ||
-          t.contract_address === "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+      for (const t of tokens) {
+        const record = data.find(it =>
+          t.address === "native"
+            ? (it.contract_ticker_symbol.toUpperCase() === t.symbol || it.contract_address.startsWith("0xeeee"))
+            : it.contract_address.toLowerCase() === t.address.toLowerCase()
         );
-      } else {
-        tokenData = items.find(t =>
-          t.contract_address.toLowerCase() === token.address.toLowerCase()
-        );
+        const amount = record ? parseFloat(record.balance) / (10 ** t.decimals) : 0;
+        const usd = amount * (record?.quote_rate || 0);
+        totalUSD += usd;
+        if (amount > 0) {
+          list.push({
+            symbol: t.symbol,
+            logo: t.logo,
+            amount: amount.toFixed(4),
+            price: (record?.quote_rate || 0).toFixed(2),
+            usd: usd.toFixed(2)
+          });
+        }
       }
 
-      const raw = tokenData
-        ? parseFloat(tokenData.balance) / Math.pow(10, token.decimals)
-        : 0;
+      overallTotal += totalUSD;
 
-      const price = tokenData?.quote_rate || 0;
-      const usdValue = raw * price;
-      totalUSD += usdValue;
-
-      balances.push({
-        symbol: token.symbol,
-        logo: token.logo,
-        amount: raw.toFixed(4),
-        usd: usdValue.toFixed(2),
-        price: price.toFixed(2)
-      });
+      dash.innerHTML += `
+        <div class="chain-section">
+          <h3>${chain.name} — $${totalUSD.toFixed(2)}</h3>
+          <ul>
+            ${list.map(b => `
+              <li><img src="${b.logo}" width="20" onerror="this.src='fallback.png'"/> 
+                ${b.symbol}: ${b.amount} × $${b.price} = <strong>$${b.usd}</strong>
+              </li>`).join("")}
+          </ul>
+        </div>`;
+    } catch (e) {
+      dash.innerHTML += `<p style="color:red;">Failed to load ${chain.name}</p>`;
+      console.error(chain.name, e);
     }
-
-    balances.sort((a, b) => parseFloat(b.usd) - parseFloat(a.usd));
-
-    let html = `<h3>${CHAINS[currentChain].name} Portfolio: $${totalUSD.toFixed(2)}</h3>`;
-    html += `<ul>`;
-    for (const b of balances) {
-      html += `
-        <li>
-          <img src="${b.logo}" width="20" onerror="this.src='fallback.png'" />
-          ${b.symbol}: ${b.amount} × $${b.price} = <strong>$${b.usd}</strong>
-        </li>`;
-    }
-    html += "</ul>";
-    display.innerHTML = html;
-
-  } catch (err) {
-    console.error("Multichain error:", err);
-    display.innerHTML = `<p style="color:red;">Error loading data for ${currentChain}.</p>`;
-  } finally {
-    spinner.style.display = "none";
   }
+
+  dash.innerHTML = `<h2>Total across chains: $${overallTotal.toFixed(2)}</h2>` + dash.innerHTML;
+  spinner.style.display = "none";
 }
