@@ -1,0 +1,26 @@
+[
+  {
+    "symbol": "MATIC",
+    "address": "native",
+    "decimals": 18,
+    "logo": "https://cryptologos.cc/logos/polygon-matic-logo.png"
+  },
+  {
+    "symbol": "USDT",
+    "address": "0xC2132D05D31c914a87C6611C10748AEb04B58e8F",
+    "decimals": 6,
+    "logo": "https://cryptologos.cc/logos/tether-usdt-logo.png"
+  },
+  {
+    "symbol": "USDC",
+    "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    "decimals": 6,
+    "logo": "https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
+  },
+  {
+    "symbol": "DAI",
+    "address": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+    "decimals": 18,
+    "logo": "https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png"
+  }
+]
