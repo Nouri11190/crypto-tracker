@@ -1,0 +1,32 @@
+[
+  {
+    "symbol": "ETH",
+    "address": "native",
+    "decimals": 18,
+    "logo": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
+  },
+  {
+    "symbol": "USDT",
+    "address": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    "decimals": 6,
+    "logo": "https://cryptologos.cc/logos/tether-usdt-logo.png"
+  },
+  {
+    "symbol": "USDC",
+    "address": "0xA0b86991C6218B36c1D19D4a2e9Eb0cE3606EB48",
+    "decimals": 6,
+    "logo": "https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
+  },
+  {
+    "symbol": "DAI",
+    "address": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    "decimals": 18,
+    "logo": "https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png"
+  },
+  {
+    "symbol": "LINK",
+    "address": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+    "decimals": 18,
+    "logo": "https://cryptologos.cc/logos/chainlink-link-logo.png"
+  }
+]
