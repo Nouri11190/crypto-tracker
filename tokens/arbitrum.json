@@ -1,0 +1,20 @@
+[
+  {
+    "symbol": "ETH",
+    "address": "native",
+    "decimals": 18,
+    "logo": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
+  },
+  {
+    "symbol": "USDC",
+    "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+    "decimals": 6,
+    "logo": "https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
+  },
+  {
+    "symbol": "DAI",
+    "address": "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+    "decimals": 18,
+    "logo": "https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png"
+  }
+]
