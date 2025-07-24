@@ -1,82 +1,70 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Multi-Chain Wallet Token Tracker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
-      color: #333;
-    }
-    #wallet-display ul {
-      list-style-type: none;
-      padding: 0;
-    }
-    #wallet-display li {
-      margin: 10px 0;
-      padding: 8px;
-      background: #fff;
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-    }
-    #wallet-display img {
-      margin-right: 10px;
-      border-radius: 50%;
-    }
-    #spinner {
-      display: none;
-      font-size: 16px;
-      margin: 10px 0;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background-color: #4CAF50;
-      color: white;
-    }
-    input[type="text"] {
-      padding: 10px;
-      width: 90%;
-      font-size: 16px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-  </style>
-</head>
-<body>
+async function loadWalletData(wallet) {
+  const display = document.getElementById('wallet-display');
+  const spinner = document.getElementById('spinner');
+  const selectedChainId = document.getElementById('chain-selector').value;
 
-  <h2>🔍 Token Balance Tracker</h2>
+  spinner.style.display = 'block';
+  display.innerHTML = '';
 
-  <!-- Connect Wallet Button -->
-  <button id="connect-btn">🔌 Connect Wallet</button>
+  try {
+    const tokenFile = `./tokens/${getChainName(selectedChainId)}.json`;
+    const tokenRes = await fetch(tokenFile);
+    const tokenList = await tokenRes.json();
 
-  <!-- Wallet Address Input -->
-  <input type="text" id="wallet-address" placeholder="Enter wallet address..." />
+    const covalentUrl = `https://api.covalenthq.com/v1/${selectedChainId}/address/${wallet}/balances_v2/?key=${API_KEY}`;
+    const covalentRes = await fetch(covalentUrl);
+    const covalentData = await covalentRes.json();
 
-  <!-- Manual Load Button -->
-  <button id="load-btn">🔄 Load Wallet</button>
+    if (!covalentData?.data?.items) throw new Error("Invalid Covalent response");
 
-  <!-- Spinner / Loading Indicator -->
-  <div id="spinner">⏳ Loading tokens...</div>
+    const items = covalentData.data.items;
 
-  <!-- Token Results Area -->
-  <div id="wallet-display"></div>
+    let balances = tokenList.map(token => {
+      let match = items.find(item =>
+        token.address === 'native'
+          ? item.contract_ticker_symbol === 'ETH' || item.contract_address === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+          : item.contract_address.toLowerCase() === token.address.toLowerCase()
+      );
 
-  <!-- Dependencies -->
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+      const value = match
+        ? (parseFloat(match.balance) / Math.pow(10, token.decimals)).toFixed(4)
+        : "0.0000";
 
-  <!-- Your main wallet logic -->
-  <script src="wallet.js"></script>
+      return {
+        symbol: token.symbol,
+        logo: token.logo,
+        value
+      };
+    });
 
-</body>
-</html>
+    balances = balances.filter(b => parseFloat(b.value) > 0);
+    balances.sort((a, b) => parseFloat(b.value) < parseFloat(a.value) ? 1 : -1);
+
+    display.innerHTML = `<h3>📊 Balances on ${getChainName(selectedChainId)}</h3><ul>` +
+      balances.map(b => `
+        <li>
+          <img src="${b.logo}" width="20" onerror="this.src='fallback.png'" />
+          ${b.symbol}: ${b.value}
+        </li>
+      `).join('') +
+      '</ul>';
+
+  } catch (err) {
+    console.error(err);
+    display.innerHTML = `<p style="color:red;">⚠️ Error loading data</p>`;
+  } finally {
+    spinner.style.display = 'none';
+  }
+}
+
+function getChainName(id) {
+  const map = {
+    "1": "Ethereum",
+    "56": "BSC",
+    "137": "Polygon",
+    "10": "Optimism",
+    "42161": "Arbitrum",
+    "8453": "Base"
+  };
+  return map[id] || "Ethereum";
+}
