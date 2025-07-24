@@ -1,0 +1,20 @@
+[
+  {
+    "symbol": "BNB",
+    "address": "native",
+    "decimals": 18,
+    "logo": "https://cryptologos.cc/logos/binance-coin-bnb-logo.png"
+  },
+  {
+    "symbol": "USDT",
+    "address": "0x55d398326f99059ff775485246999027b3197955",
+    "decimals": 18,
+    "logo": "https://cryptologos.cc/logos/tether-usdt-logo.png"
+  },
+  {
+    "symbol": "USDC",
+    "address": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+    "decimals": 18,
+    "logo": "https://cryptologos.cc/logos/usd-coin-usdc-logo.png"
+  }
+]
