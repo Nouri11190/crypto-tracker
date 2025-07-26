@@ -2,11 +2,13 @@ async function loadBinanceData() {
   const container = document.getElementById("binance-data");
   container.innerHTML = "<h2>Binance Top Gainers (24h)</h2><p>Loading...</p>";
 
+  const proxyUrl = "https://corsproxy.io/?";  // Free CORS proxy for GitHub Pages
+  const binanceUrl = "https://api.binance.com/api/v3/ticker/24hr";
+
   try {
-    const response = await fetch("https://api.binance.com/api/v3/ticker/24hr");
+    const response = await fetch(proxyUrl + binanceUrl);
     const data = await response.json();
 
-    // Sort by biggest % gain
     const topGainers = data
       .filter(item => item.symbol.endsWith("USDT"))
       .sort((a, b) => parseFloat(b.priceChangePercent) - parseFloat(a.priceChangePercent))
@@ -24,8 +26,8 @@ async function loadBinanceData() {
       </ul>
     `;
   } catch (err) {
-    container.innerHTML = "<p>Failed to load Binance data.</p>";
-    console.error(err);
+    container.innerHTML = "<p>❌ Failed to load Binance data.</p>";
+    console.error("Binance error:", err);
   }
 }
 
