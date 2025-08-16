@@ -1,0 +1,7 @@
+[build]
+  publish = "public"
+  functions = "functions"
+  command = "echo 'No build required'"
+
+[dev]
+  functions = "functions"
