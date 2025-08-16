@@ -1,154 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Support My Projects</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f7f7f7;
-            color: #333;
-            margin: 0;
-        }
-
-        /* Navigation menu */
-        .bar {
-            background-color: rgb(245, 193, 97);
-            width: 100%;
-            height: 40px;
-            display: flex;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .bar li {
-            height: 100%;
-            width: 100px;
-            border-right: 1px solid rgb(235, 177, 69);
-        }
-        .bar li a {
-            color: black;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-        }
-        .bar li a:hover {
-            background-color: rgb(235, 177, 69);
-        }
-        .bar li a.active {
-            background-color: rgb(165, 113, 16);
-            color: white;
-        }
-
-        /* Main content */
-        .content {
-            text-align: center;
-            padding: 40px;
-        }
-        h1 {
-            color: #222;
-        }
-        .donation-container {
-            margin-top: 40px;
-        }
-        .btc-box, .coffee-box, .contact-box {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin: 20px auto;
-            width: 300px;
-        }
-        .btc-address {
-            font-family: monospace;
-            font-size: 14px;
-            background: #eee;
-            padding: 5px;
-            border-radius: 4px;
-            word-wrap: break-word;
-        }
-        button {
-            background: #ff9800;
-            color: #fff;
-            border: none;
-            padding: 10px 16px;
-            font-size: 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover {
-            background: #e68900;
-        }
-        a {
-            text-decoration: none;
-            color: white;
-        }
-        .contact-box ul {
-            list-style: none;
-            padding: 0;
-        }
-        .contact-box a {
-            color: #0073e6;
-            text-decoration: none;
-        }
-        .contact-box a:hover {
-            text-decoration: underline;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Support My Projects & Crypto Dashboard</title>
+<style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+    .bar { background-color: rgb(245, 193, 97); width: 100%; display: flex; list-style: none; padding: 0; margin: 0; }
+    .bar li { height: 40px; width: 120px; border-right: 1px solid rgb(235, 177, 69); }
+    .bar li a { color: black; display: flex; align-items: center; justify-content: center; text-decoration: none; height: 100%; }
+    .bar li a:hover { background-color: rgb(235, 177, 69); }
+    .bar li a.active { background-color: rgb(165, 113, 16); color: white; }
+    .content { text-align: center; padding: 40px; }
+    h1, h2 { color: #222; }
+    .box { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin: 20px auto; max-width: 600px; }
+    .btc-address { font-family: monospace; font-size: 14px; background: #eee; padding: 5px; border-radius: 4px; word-wrap: break-word; }
+    button { background: #ff9800; color: #fff; border: none; padding: 10px 16px; font-size: 16px; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #e68900; }
+    a { text-decoration: none; color: white; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #f0c76a; }
+</style>
 </head>
 <body>
 
-    <!-- Navigation -->
-    <nav>
-        <ul class="bar">
-            <li><a href="#" class="active">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="#">Careers</a></li>
-        </ul>
-    </nav>
+<!-- Navigation -->
+<nav>
+<ul class="bar">
+    <li><a href="#" class="active">Home</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#">Crypto Dashboard</a></li>
+</ul>
+</nav>
 
-    <!-- Main Content -->
-    <div class="content">
-        <h1>Support My Work</h1>
-        <p>Every little contribution helps me keep building and improving my apps.</p>
+<div class="content">
+    <h1>Support My Work</h1>
+    <p>Every little contribution helps me keep building and improving my apps.</p>
 
-        <div class="donation-container">
-            
-            <!-- BTC Donation Section -->
-            <div class="btc-box">
-                <h2>Donate Bitcoin</h2>
-                <p>Scan the QR or copy the wallet address below:</p>
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=1JdMoFe3Jr2nijUxBfgUByWktBQFK2qAqq" alt="BTC QR Code">
-                <p class="btc-address">1JdMoFe3Jr2nijUxBfgUByWktBQFK2qAqq</p>
-            </div>
-
-            <!-- Buy Me a Coffee Section -->
-            <div class="coffee-box">
-                <h2>Buy Me a Coffee</h2>
-                <p>If you prefer, you can send me a small tip via Buy Me a Coffee.</p>
-                <button>
-                    <a href="https://www.buymeacoffee.com/yourusername" target="_blank">Buy Me a Coffee</a>
-                </button>
-            </div>
-
-            <!-- Contact Section -->
-            <div id="contact" class="contact-box">
-                <h2>Contact Me</h2>
-                <p>You can reach me at:</p>
-                <ul>
-                    <li>Email: <a href="mailto:nouridarylaglainua@gmail.com">nouridarylaglainua@gmail.com</a></li>
-                    <li>Email: <a href="mailto:dawsonevelyn6@gmail.com">dawsonevelyn6@gmail.com</a></li>
-                </ul>
-            </div>
-
-        </div>
+    <div class="box">
+        <h2>Donate Bitcoin</h2>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=1JdMoFe3Jr2nijUxBfgUByWktBQFK2qAqq" alt="BTC QR Code">
+        <p class="btc-address">1JdMoFe3Jr2nijUxBfgUByWktBQFK2qAqq</p>
     </div>
+
+    <div class="box">
+        <h2>Buy Me a Coffee</h2>
+        <button><a href="https://www.buymeacoffee.com/yourusername" target="_blank">Buy Me a Coffee</a></button>
+    </div>
+
+    <div class="box" id="contact">
+        <h2>Contact Me</h2>
+        <p>You can reach me at:</p>
+        <ul>
+            <li>Email: <a href="mailto:nouridarylaglainua@gmail.com">nouridarylaglainua@gmail.com</a></li>
+            <li>Email: <a href="mailto:dawsonevelyn6@gmail.com">dawsonevelyn6@gmail.com</a></li>
+        </ul>
+    </div>
+
+    <!-- CMC Trending Coins -->
+    <div class="box">
+        <h2>CoinMarketCap Trending Coins</h2>
+        <table id="cmc-table">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Price (USD)</th>
+                    <th>24h Change</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="3">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Binance Futures Order Book -->
+    <div class="box">
+        <h2>Binance Futures Order Book (BTCUSD_PERP)</h2>
+        <table id="binance-table">
+            <thead>
+                <tr>
+                    <th>Side</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="3">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const CMC_API_KEY = "95aa6637-49bc-49ec-8d0e-eedc94be599d";
+
+async function fetchCMCTrending() {
+    try {
+        const res = await fetch("https://pro-api.coinmarketcap.com/v1/cryptocurrency/trending/latest", {
+            headers: { "X-CMC_PRO_API_KEY": CMC_API_KEY }
+        });
+        const data = await res.json();
+        const tbody = document.querySelector("#cmc-table tbody");
+        tbody.innerHTML = "";
+        data.data.forEach(coin => {
+            const row = `<tr>
+                <td>${coin.symbol}</td>
+                <td>$${parseFloat(coin.quote.USD.price).toFixed(2)}</td>
+                <td>${parseFloat(coin.quote.USD.percent_change_24h).toFixed(2)}%</td>
+            </tr>`;
+            tbody.insertAdjacentHTML("beforeend", row);
+        });
+    } catch(e) { console.error(e); }
+}
+
+fetchCMCTrending();
+
+// For Binance Futures Order Book, you need a serverless function to avoid exposing secret
+// This placeholder will display a static example
+const binanceData = [
+    {side: "bid", price: "45000", qty: "0.5"},
+    {side: "ask", price: "45100", qty: "0.3"},
+    {side: "bid", price: "44950", qty: "0.8"},
+    {side: "ask", price: "45200", qty: "0.2"},
+];
+
+const tbodyBinance = document.querySelector("#binance-table tbody");
+tbodyBinance.innerHTML = "";
+binanceData.forEach(row => {
+    tbodyBinance.insertAdjacentHTML("beforeend", `<tr>
+        <td>${row.side}</td>
+        <td>${row.price}</td>
+        <td>${row.qty}</td>
+    </tr>`);
+});
+</script>
 
 </body>
 </html>
